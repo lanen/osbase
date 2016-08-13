@@ -1,0 +1,57 @@
+---
+- name: Send Openresty
+  become: true
+  become_user: root
+  copy:
+    src: "roles/openresty/files/ddt_openresty-1.9.15.1-1.x86_64.rpm"
+    dest: "/tmp/ddt_openresty-1.9.15.1-1.x86_64.rpm"
+- name: Install openresty
+  become: true
+  become_user: root
+  yum: 
+    name: "/tmp/ddt_openresty-1.9.15.1-1.x86_64.rpm"
+    state: "present"
+
+- name: "chkconfig openresty"
+  become: true
+  become_user: root
+  shell: "chkconfig openresty --add && chkconfig openresty on --level 234"
+ 
+- name: Config nginx.conf
+  become: true
+  become_user: root
+  template: 
+    src: "roles/openresty/templates/nginx.conf.j2"
+    dest: "/usr/local/opt/openresty/nginx/conf/nginx.conf"
+    owner: "www"
+    group: "www"
+    mode: 0644
+   
+- name: Create Vhost
+  become: true
+  become_user: root
+  file:
+    path: "/usr/local/opt/openresty/nginx/conf/vhost/"
+    state: "directory"
+
+- name: Vhost
+  become: true
+  become_user: root
+  template: 
+    src: "roles/openresty/templates/vhost/{{item}}.j2"
+    dest: "/usr/local/opt/openresty/nginx/conf/vhost/{{item}}"
+    owner: "www"
+    group: "www"
+    mode: 0644
+  with_items:
+    confs
+- name: Chmod {{ftp_home}} 744
+  become: true
+  become_user: root
+  file:
+    path: "{{ftp_home}}"
+    state: "directory"
+    mode: 0755
+#  notify:
+#    - "restart openresty"
+  

@@ -1,0 +1,55 @@
+---
+- name: Install vsftpd
+  become: true
+  become_user: root
+  yum:
+    name: "vsftpd"
+    state: "latest"
+  when: ansible_os_family == "RedHat"
+
+- name: chkconfig vsftpd
+  become: true
+  become_user: root
+  shell: "chkconfig vsftpd on"
+
+- name: Create ftp {{ ftp.user }}
+  become: true
+  become_user: root
+  user:
+    name: "{{ ftp.user }}"
+    createhome: yes
+    password: "{{ ftp.userpass }}"
+    shell: /sbin/nologin
+    state: present
+
+- name: "Install libselinux-python"
+  become: true
+  become_user: root
+  yum:
+    name: "libselinux-python"
+    state: "installed"
+
+- selinux: state=disabled
+  become: true
+  become_user: root
+#- seboolean: 
+#    name: "ftpd_disable_trans" 
+#    state: yes 
+#    persistent: yes
+
+- name: Config {{ ftp.config_file }}
+  become: true
+  become_user: root
+  template:
+    src: "roles/ftp/templates/vsftpd.conf.j2"
+    dest: "{{ ftp.config_file }}" 
+
+- name: Config {{ ftp.userlist_file }}
+  become: true 
+  become_user: root
+  template:
+    src: "roles/ftp/templates/vsftpd.userlist.j2"
+    dest: "{{ ftp.userlist_file }}"
+  notify: 
+    - "restart vsftpd"
+

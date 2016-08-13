@@ -1,0 +1,7 @@
+---
+- name: Install Mysql rpm
+  become: true
+  become_user: root
+  yum:
+    name: "{{ mysql.rpm }}"
+    state: "present"

@@ -1,0 +1,9 @@
+ftp:
+    user: ftpuser
+#python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+
+    userpass: "$6$rounds=656000$U5.0ZWH3ksdEtGwG$9Au9szrd/SJfsel2st.mGM0g5FYwcq1Ww4VU68e7A1RDS5EL167gOgXdH/LqRNUdjStJ7tmgfcg1A660A36Ui1"
+    group: ftp
+    config_file: "/etc/vsftpd/vsftpd.conf"
+    log_file: "/var/log/vsftpd/vsftpd.log"
+    userlist_file: "/etc/vsftpd/vsftpd.userlist"

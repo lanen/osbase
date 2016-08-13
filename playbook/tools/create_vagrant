@@ -1,0 +1,12 @@
+#!/bin/bash
+
+prj=$1
+
+if [[ -d "$prj"  ]]; then
+    echo "project [$prj] exists"
+    exit 1
+fi
+
+mkdir -p $prj
+
+cp Vagrantfile $prj/

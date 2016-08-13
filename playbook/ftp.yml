@@ -1,0 +1,12 @@
+---
+- name: Install Ftp server
+  gather_facts: yes
+  hosts: all
+  vars:
+    ftp_hostname: "ftp.evan.io"
+    ftp_home: "/home/ftpuser"
+    confs:
+    - "ftp.conf"
+  roles:
+  - role: roles/ftp
+  - role: roles/openresty

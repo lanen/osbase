@@ -1,0 +1,21 @@
+#!/bin/bash
+
+role=$1
+
+if [[ -z "$role" ]];then
+    
+    echo "please provide a role name"
+    exit 1
+fi
+
+base=roles
+
+mkdir -p ${base}/$1/files/
+mkdir -p ${base}/$1/handlers/
+mkdir -p ${base}/$1/tasks/
+mkdir -p ${base}/$1/templates/
+mkdir -p ${base}/$1/vars/
+mkdir -p ${base}/$1/meta/
+
+echo "---" > ${base}/$1/tasks/main.yml
+

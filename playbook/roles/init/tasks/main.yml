@@ -1,0 +1,22 @@
+---
+- name: install net-tools
+  become: true
+  become_user: root
+  yum:
+    name: "net-tools"
+    state: "latest"
+
+- name: Install wget
+  become: true
+  become_user: root
+  yum:
+    name : "wget"
+    state: "latest"
+
+- name : install eth1
+  become: true
+  become_user: root
+  template: 
+    src: "roles/init/templates/ifcfg-eth1.j2"
+    dest: "/etc/sysconfig/network-scripts/ifcfg-eth1"
+ 
