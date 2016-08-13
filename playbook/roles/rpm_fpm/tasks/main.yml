@@ -1,0 +1,44 @@
+---
+- name: Install ruby-devel, rpmbuild, gcc
+  become: true
+  become_user: root
+  yum:
+    name: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "ruby-devel"
+    - "gcc"
+    - "rpm-build"
+
+- name: Update gem source add ruby.taobao.org 
+  become: true
+  become_user: root
+  command : "gem sources --add https://ruby.taobao.org/ "
+
+- name: Update gem source remove rubygems.org 
+  become: true
+  become_user: root
+  command : "gem sources --remove https://rubygems.org/"
+
+- name: Update rubygems
+  become: true
+  become_user: root
+  command: "gem update --system"
+
+- name: Install {{ item  }}
+  become: true
+  become_user: root
+  gem:
+    name: "{{ item }}"
+    state: "latest"
+    user_install: no
+  with_items:
+    - "json_pure"
+    - "ffi"
+    - "cabin"
+    - "backports"
+    - "fpm"
+
+
+
+

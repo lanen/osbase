@@ -1,0 +1,6 @@
+---
+- name: Install RPM fpm
+  gather_facts: yes
+  hosts: all
+  roles:
+  - role: roles/rpm_fpm

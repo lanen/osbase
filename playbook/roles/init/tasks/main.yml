@@ -1,17 +1,16 @@
 ---
-- name: install net-tools
+- name: Install base command
   become: true
   become_user: root
   yum:
-    name: "net-tools"
+    name: "{{ item }}"
     state: "latest"
-
-- name: Install wget
-  become: true
-  become_user: root
-  yum:
-    name : "wget"
-    state: "latest"
+  with_items:
+    - "net-tools"
+    - "wget"
+    - "zip"
+    - "unzip"
+    - "git"
 
 - name : install eth1
   become: true
