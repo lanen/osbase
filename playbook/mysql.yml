@@ -1,0 +1,10 @@
+---
+- name: Install Mysql-5.6.32 server
+  gather_facts: yes
+  hosts: all
+  vars:
+    mysql_user: "mysql"
+    mysql_rpm: "http://ftp.evan.io/rpms/ddb-mysql-5.6.32-1.0-1.x86_64.rpm"
+    app_port: "18580"
+  roles:
+  - role: roles/mysql

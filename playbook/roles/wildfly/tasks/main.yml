@@ -1,0 +1,105 @@
+---
+- name: "Install wildfly"
+  become: true
+  become_user: root
+  yum: 
+    name: "{{wildfly_rpm}}"
+    state: "installed"
+- name: "Create {{file_owner}} user"
+  become: true
+  become_user: "root"
+  user:
+    name: "{{file_owner}}"
+    createhome: yes
+    state: "present"
+  
+- name: "Create wildfly runtime user"
+  become: true
+  become_user: "root"
+  user:
+    name: "{{wildfly_user}}"
+    createhome: no
+    shell: "/sbin/nologin"
+    state: "present"
+
+- name: "Create Wildfly Home Dir" 
+  become: true
+  become_user: "root"
+  file: 
+    path: "{{wildfly_home}}/{{item}}"
+    state: "directory"
+    mode:  0755
+    owner: "{{file_owner}}"
+    group: "{{file_owner}}"
+  with_items:
+    - "ddb"
+    - "conf"
+    - "wars"
+    - "logs/{{ app_name }}-{{ app_port }}"
+
+- name: "Config wildfly App wildfly.conf"
+  become: true
+  become_user: "root"
+  template:
+    src: "template.conf"
+    dest: "{{ wildfly_home }}/conf/{{ app_name }}-{{ app_port }}.conf"
+    mode: 0755
+    owner: "{{file_owner}}"
+    group: "{{file_owner}}"
+
+- name: "Config wildfly App System V init Script: wildfly-{{ app_name }}-{{ app_port }}"
+  become: true
+  become_user: "root"
+  template:
+    src: "wildfly.sh"
+    dest: "/etc/init.d/wildfly-{{ app_name }}-{{ app_port }}" 
+    mode: 0755
+    owner: "root"
+    group: "root"
+
+- name: "Clear standalone"
+  become: true
+  become_user: "root"
+  file:
+    path: "{{ wildfly_home }}/ddb/{{ app_name }}-{{ app_port }}"
+    state: "absent"
+
+- name: "Reset standalone"
+  become: true
+  become_user: "root"
+  shell: "/bin/cp -r {{ wildflyStlDir }} {{ wildfly_home }}/ddb/{{ app_name }}-{{ app_port }}"
+- name: "change file owner"
+  become: true
+  become_user: "root"
+#  file:
+#    path: "{{ wildfly_home }}/ddb/"
+#    state: "directory"
+#    mode: 0755
+#    owner: "{{file_owner}}"
+#    group: "{{file_owner}}"
+  shell: "/bin/chown -R {{ file_owner }}:{{ file_owner }} {{ wildfly_home }}/ddb/"
+
+
+- name: "config standlaone.xml" 
+  become: true
+  become_user: "root"
+  template:
+    src: "standalone.xml"
+    dest: "{{ wildfly_home }}/ddb/{{ app_name }}-{{ app_port }}/configuration/"
+    mode: 0755
+    owner: "{{file_owner}}"
+    group: "{{file_owner}}"
+    
+- name: "stop wildlfy {{app_port}}"
+  become: true
+  become_user: root
+  shell: "/etc/init.d/wildfly-{{ app_name }}-{{ app_port }} stop"
+  ignore_errors: yes
+
+- name: "start wildlfy {{app_port}}"
+  become: true
+  become_user: root
+  shell: "/etc/init.d/wildfly-{{ app_name }}-{{ app_port }} start"
+  ignore_errors: yes
+
+

@@ -1,3 +1,38 @@
 ---
 mysql:
-    rpm: "http://"
+    rpm: "http://ftp.evan.io/rpms/ddb-mysql-5.6.32-1.0-1.x86_64.rpm"
+    top_datadir: /data/mysql
+    user: "mysql"
+    path: "/usr/local/opt/mysql-5.6.32"
+    port: 3306
+    back_log: 10240
+    log_dir: /var/log/mysql
+    max_connections: 20480
+    connect_timeout: 30
+    max_allowed_packet: 32M
+    innodb_log_buffer_size: 16M
+    innodb_buffer_pool_size: 64M
+    innodb_buffer_pool_instances: 4
+    innodb_io_capacity: 800
+    innodb_open_files: 4000
+    innodb_read_io_threads: 16
+    innodb_write_io_threads: 16
+    
+    server_id:
+        toggle: False
+        id: 43
+
+    binlog:
+      toggle: False
+      binlog_dir: '/data/mysql/mysql-binlog'
+      relaylog_dir: '/data/mysql/mysql-relaylog'
+      max_binlog_size: 256M
+      format: row
+      expire_logs_days: 7
+
+    slave:
+      toggle: False
+      server_id: 43
+      read_only: 'true'
+      relaylog_dir: '/data/mysql/mysql-relay-log'
+    

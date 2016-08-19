@@ -1,0 +1,16 @@
+---
+- name: Install Wildfly 9.0.2.Final server
+  gather_facts: yes
+  hosts: all
+  vars:
+    wildflyInstallHome: "/usr/local/opt/wildfly-9.0.2.Final"
+    wildflyStlDir: "{{wildflyInstallHome}}/standalone"
+    java_mem: "512M"
+    wildfly_user: "wildfly"
+    wildfly_rpm: "http://ftp.evan.io/rpms/ddb-wildfly-9.0.2.Final-1.0-1.x86_64.rpm"
+    file_owner: "summary"
+    wildfly_home: "/home/summary/servers/wildfly"
+    app_name: "statistics"
+    app_port: "18580"
+  roles:
+  - role: roles/wildfly

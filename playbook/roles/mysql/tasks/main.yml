@@ -1,7 +1,97 @@
 ---
+- set_fact:
+    mysql: "{{ mysql|combine(temp.mysql) }}"
+  when: temp.mysql is defined
+
 - name: Install Mysql rpm
   become: true
   become_user: root
   yum:
     name: "{{ mysql.rpm }}"
+    state: "installed"
+
+- name: "Create Mysql User : {{mysql.user}}"
+  become: true
+  become_user: root
+  user:
+    name : "{{mysql.user}}"
+    createhome: no
+    shell: "/sbin/nologin"
     state: "present"
+  ignore_errors: yes
+
+- name: Create the mysql dir
+  become: true
+  become_user: "root"
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ mysql.user }}"
+    group: "{{ mysql.user }}"
+  with_items:
+    - "{{ mysql.log_dir }}"
+    - "{{ mysql.path }}/etc"
+    - "{{ mysql.top_datadir }}/mysql{{ mysql.port }}"
+
+- name: Create the mysql binlog dir
+  become: true
+  become_user: "root"
+  file:
+    path: "{{ mysql.binlog.binlog_dir }}"
+    state: directory
+    mode: 0755
+    owner: "{{ mysql.user }}"
+    group: "{{ mysql.user }}"
+
+- name: Create the mysql relay dir
+  become: true
+  become_user: "root"
+  file:
+    path: "{{ mysql.binlog.relaylog_dir }}"
+    state: directory
+    mode: 0755
+    owner: "{{ mysql.user }}"
+    group: "{{ mysql.user }}"
+
+- name: Template the mysql config
+  become: true
+  become_user: "root"
+  template: 
+    src: "roles/mysql/templates/conf/my.cnf"
+    dest: "{{ mysql.path }}/etc/my{{ mysql.port }}.cnf"
+    mode: 0644                                               
+    owner: "{{ mysql.user }}"
+    group: "{{ mysql.user }}"
+
+- name: Template the system V init Script
+  become: true
+  become_user: "root"
+  template: 
+    src: init.d/mysqld
+    dest: "/etc/init.d/mysqld{{ mysql.port }}"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Copy client use mysql config /etc/my.cnf
+  become: true
+  become_user: "root"
+  copy: 
+    src: "roles/mysql/templates/conf/my.cnf"
+    dest: /etc/    
+    mode: 0644     
+    owner: root    
+    group: root    
+
+- name: Setup the mysql user pam limit
+  become: true
+  become_user: "root"
+  pam_limits:
+    domain: "{{ mysql.user }}"
+    limit_type: "{{ item[0] }}"
+    limit_item: "{{ item[1] }}"
+    value: 1020000
+  with_nested:
+      - [ 'soft', 'hard' ]
+      - [ 'nofile', 'nproc', 'fsize' ]  
