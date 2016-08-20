@@ -68,7 +68,7 @@
   become: true
   become_user: "root"
   template: 
-    src: init.d/mysqld
+    src: "roles/mysql/templates/init.d/mysqld"
     dest: "/etc/init.d/mysqld{{ mysql.port }}"
     mode: 0755
     owner: root
@@ -78,8 +78,8 @@
   become: true
   become_user: "root"
   copy: 
-    src: "roles/mysql/templates/conf/my.cnf"
-    dest: /etc/    
+    src: "roles/mysql/templates/raw_my.cnf"
+    dest: "/etc/my.cnf"    
     mode: 0644     
     owner: root    
     group: root    
